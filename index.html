@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0f">
+<title>Athletic Power Building</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a26;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text2: #8888a0;
+    --red: #ff3a5c;
+    --red-dim: #ff3a5c30;
+    --blue: #3a7bff;
+    --blue-dim: #3a7bff30;
+    --green: #22c55e;
+    --green-dim: #22c55e25;
+    --orange: #ff8a2b;
+    --orange-dim: #ff8a2b30;
+    --purple: #a855f7;
+    --purple-dim: #a855f730;
+    --yellow: #eab308;
+    --mon: var(--red);
+    --tue: var(--blue);
+    --wed: var(--green);
+    --thu: var(--orange);
+    --fri: var(--purple);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── TOP BAR ─────────────────────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .topbar h1 {
+    font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--red), var(--orange));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── USER TABS ───────────────────────────── */
+  .user-tabs {
+    display: flex; gap: 6px;
+  }
+  .user-tab {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--border); background: transparent; color: var(--text2);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .user-tab.active {
+    background: var(--red); border-color: var(--red); color: #fff;
+  }
+
+  /* ── WEEK SELECTOR ───────────────────────── */
+  .week-selector {
+    display: flex; gap: 6px; padding: 12px 16px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .week-btn {
+    flex-shrink: 0; padding: 10px 20px; border-radius: 10px;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+    border: 1.5px solid var(--border); background: var(--bg2); color: var(--text2);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .week-btn.active {
+    background: var(--bg3); border-color: var(--text); color: var(--text);
+  }
+
+  /* ── DAY SELECTOR ────────────────────────── */
+  .day-selector {
+    display: flex; gap: 4px; padding: 6px 16px 12px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .day-btn {
+    flex-shrink: 0; padding: 8px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    border: 1.5px solid var(--border); background: transparent; color: var(--text2);
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .day-btn.active { color: #fff; }
+  .day-btn[data-day="Monday"].active { background: var(--red-dim); border-color: var(--mon); color: var(--mon); }
+  .day-btn[data-day="Tuesday"].active { background: var(--blue-dim); border-color: var(--tue); color: var(--tue); }
+  .day-btn[data-day="Wednesday"].active { background: var(--green-dim); border-color: var(--wed); color: var(--wed); }
+  .day-btn[data-day="Thursday"].active { background: var(--orange-dim); border-color: var(--thu); color: var(--thu); }
+  .day-btn[data-day="Friday"].active { background: var(--purple-dim); border-color: var(--fri); color: var(--fri); }
+
+  .day-btn .done-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    position: absolute; top: 4px; right: 4px; display: none;
+  }
+  .day-btn.completed .done-dot { display: block; }
+
+  /* ── DAY HEADER ──────────────────────────── */
+  .day-header {
+    padding: 14px 16px; margin: 0 16px; border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .day-header h2 { font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; }
+  .day-header p { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; font-weight: 300; }
+  .day-header.Monday { background: linear-gradient(135deg, #ff3a5c20, #ff3a5c08); border: 1px solid #ff3a5c40; }
+  .day-header.Tuesday { background: linear-gradient(135deg, #3a7bff20, #3a7bff08); border: 1px solid #3a7bff40; }
+  .day-header.Wednesday { background: linear-gradient(135deg, #22c55e20, #22c55e08); border: 1px solid #22c55e40; }
+  .day-header.Thursday { background: linear-gradient(135deg, #ff8a2b20, #ff8a2b08); border: 1px solid #ff8a2b40; }
+  .day-header.Friday { background: linear-gradient(135deg, #a855f720, #a855f708); border: 1px solid #a855f740; }
+
+  /* ── PROGRESS BAR ────────────────────────── */
+  .progress-wrap {
+    padding: 0 16px 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .progress-bar {
+    flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--green); border-radius: 3px; transition: width 0.4s ease;
+  }
+  .progress-text { font-size: 12px; font-weight: 700; color: var(--green); min-width: 36px; text-align: right; }
+
+  /* ── EXERCISE CARDS ──────────────────────── */
+  .exercises { padding: 0 12px 20px; }
+
+  .ex-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s;
+  }
+  .ex-card.checked { border-color: var(--green); }
+  .ex-card.checked .ex-header { opacity: 0.6; }
+
+  .ex-header {
+    display: flex; align-items: flex-start; gap: 10px; padding: 14px;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .ex-check {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
+    border: 2px solid var(--border); background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; margin-top: 1px;
+  }
+  .ex-check.done { background: var(--green); border-color: var(--green); }
+  .ex-check.done::after { content: '✓'; color: #fff; font-size: 15px; font-weight: 700; }
+
+  .ex-info { flex: 1; }
+  .ex-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .ex-sets { font-size: 12px; font-weight: 600; color: var(--blue); margin-top: 2px; }
+
+  .ex-toggle {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
+    border: none; background: var(--bg3); color: var(--text2);
+    font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+  }
+  .ex-toggle.open { transform: rotate(180deg); }
+
+  .ex-details {
+    display: none; padding: 0 14px 14px; border-top: 1px solid var(--border);
+  }
+  .ex-details.show { display: block; }
+
+  .ex-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 10px; }
+  .ex-tip { font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 8px; font-style: italic; }
+  .ex-tip b { color: var(--yellow); font-style: normal; }
+  .ex-wt { font-size: 11px; color: var(--red); line-height: 1.5; margin-top: 4px; font-weight: 600; }
+
+  /* ── INPUT FIELDS ────────────────────────── */
+  .input-row {
+    display: flex; gap: 8px; margin-top: 12px;
+  }
+  .input-group {
+    flex: 1;
+  }
+  .input-group label {
+    display: block; font-size: 10px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  .input-group input, .input-group textarea {
+    width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 10px; color: var(--text); font-size: 14px;
+    font-family: 'JetBrains Mono', monospace; outline: none; transition: border-color 0.2s;
+  }
+  .input-group input:focus, .input-group textarea:focus {
+    border-color: var(--blue);
+  }
+  .input-group input::placeholder, .input-group textarea::placeholder {
+    color: var(--text2); opacity: 0.5;
+  }
+  .input-group textarea {
+    resize: none; height: 44px; font-size: 12px; font-family: 'Outfit', sans-serif;
+  }
+  .notes-group { margin-top: 8px; }
+
+  /* ── SUMMARY SECTION ─────────────────────── */
+  .summary-section {
+    padding: 16px; margin: 0 12px 20px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 12px;
+  }
+  .summary-section h3 {
+    font-size: 14px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .stat-box {
+    background: var(--bg2); border-radius: 8px; padding: 12px; text-align: center;
+  }
+  .stat-num { font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .stat-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  .log-table { width: 100%; margin-top: 12px; border-collapse: collapse; }
+  .log-table th {
+    font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 8px 6px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .log-table td {
+    font-size: 12px; padding: 7px 6px; border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .log-table td:first-child { font-family: 'Outfit', sans-serif; font-weight: 600; }
+  .log-table .completed-row td { color: var(--green); }
+  .log-table .pending-row td { color: var(--text2); }
+
+  /* ── ACTIONS ─────────────────────────────── */
+  .actions-bar {
+    padding: 12px 16px 32px; display: flex; gap: 8px;
+  }
+  .act-btn {
+    flex: 1; padding: 14px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    border: 1.5px solid var(--border); background: var(--bg2); color: var(--text2);
+    cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  .act-btn:active { transform: scale(0.97); }
+  .act-btn.danger { border-color: #ff3a5c40; color: var(--red); }
+
+  /* ── MISC ────────────────────────────────── */
+  .spacer { height: 80px; }
+  .hidden { display: none !important; }
+
+  @media (max-width: 380px) {
+    .day-btn { padding: 7px 10px; font-size: 11px; }
+    .ex-name { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Power Build</h1>
+  <div class="user-tabs">
+    <button class="user-tab active" data-user="ken" onclick="switchUser('ken')">Ken</button>
+    <button class="user-tab" data-user="hayden" onclick="switchUser('hayden')">Hayden</button>
+  </div>
+</div>
+
+<div class="week-selector" id="weekSelector"></div>
+<div class="day-selector" id="daySelector"></div>
+
+<div id="dayHeaderWrap"></div>
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0/6</div>
+</div>
+
+<div class="exercises" id="exerciseList"></div>
+
+<div id="summaryWrap"></div>
+
+<div class="actions-bar">
+  <button class="act-btn" onclick="exportData()">Export Log</button>
+  <button class="act-btn danger" onclick="resetCurrentDay()">Reset Day</button>
+</div>
+
+<div class="spacer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// WORKOUT DATA
+// ═══════════════════════════════════════════════════════════════
+const PROGRAM = {
+"Week 1": {
+"Monday": { focus: "Chest & Triceps — Foundation Strength", exercises: [
+  {name:"Flat Barbell Bench Press",sets:"4 x 6-8",desc:"Lie flat on bench, grip bar slightly wider than shoulder-width. Lower bar to mid-chest, press up explosively to lockout.",tip:"Plant feet flat, squeeze glutes, keep a slight arch in your lower back. Drive through the floor with your legs on every rep. Don't bounce the bar off your chest.",wt:"At 180-200 lb, start around 155-185 lb. Choose a weight where rep 6 is hard and rep 8 is near failure."},
+  {name:"Incline Dumbbell Press",sets:"3 x 8-10",desc:"Set bench to 30-degree incline. Press dumbbells from chest level to full lockout, squeezing at the top.",tip:"Keep elbows at a 45-degree angle, not flared out at 90. Bring the dumbbells together at the top for a peak contraction.",wt:"Start with 55-70 lb dumbbells. You should struggle on reps 9-10."},
+  {name:"Cable Crossover Flyes",sets:"3 x 12-15",desc:"Set cables to high position. Step forward, bring handles together in a hugging arc motion in front of your chest.",tip:"Keep a slight bend in your elbows — this is not a pressing motion. Squeeze and hold at the bottom for 1 second.",wt:"Light-moderate. 20-35 lb per side. Focus on the squeeze, not the weight."},
+  {name:"Close-Grip Bench Press",sets:"3 x 8-10",desc:"Same bench setup, but grip the bar shoulder-width or slightly narrower. Lower to lower chest, press up.",tip:"Keep elbows tucked tight to your body. This shifts load from chest to triceps. Don't go too narrow — shoulder-width is plenty.",wt:"Start around 60-70% of your flat bench. If you bench 185, use about 115-135 lb."},
+  {name:"Overhead Tricep Cable Extension",sets:"3 x 12-15",desc:"Face away from cable, rope attachment overhead. Extend arms forward and up, locking out at full extension.",tip:"Don't let your elbows flare — keep them pointed forward and tight. The stretch at the bottom is where the magic happens.",wt:"30-50 lb. Full range of motion matters more than heavy weight here."},
+  {name:"Explosive Medicine Ball Chest Pass",sets:"3 x 10",desc:"Stand facing a wall, hold med ball at chest. Explosively push the ball into the wall, catch and repeat rapidly.",tip:"This is your athletic finisher — focus on max velocity, not endurance. Stay on the balls of your feet.",wt:"10-15 lb med ball. Speed is the goal, not load."},
+]},
+"Tuesday": { focus: "Back & Biceps — Width & Thickness", exercises: [
+  {name:"Barbell Bent-Over Row",sets:"4 x 6-8",desc:"Hinge at hips to 45 degrees, pull barbell from hang to your lower chest/upper abdomen.",tip:"Keep your back flat — if you're rounding, the weight is too heavy. Think about driving your elbows behind you.",wt:"Start around 135-165 lb. Form is king."},
+  {name:"Lat Pulldown (Wide Grip)",sets:"3 x 8-10",desc:"Grip the bar wide, lean back slightly, pull to upper chest. Squeeze shoulder blades together at the bottom.",tip:"Don't pull behind the neck. Initiate the pull by depressing your shoulder blades first, then bend the elbows.",wt:"120-160 lb. If you can't control the negative for 2 seconds, go lighter."},
+  {name:"Seated Cable Row (V-Bar)",sets:"3 x 10-12",desc:"Sit upright, pull V-bar handle to your lower chest. Let your shoulders stretch forward on the return.",tip:"Don't lean way back — a slight rock is fine. Pause and squeeze for 1 second at your chest on every rep.",wt:"130-170 lb. Moderate and controlled."},
+  {name:"Barbell Curl (Straight Bar)",sets:"3 x 8-10",desc:"Stand upright, curl the barbell from full arm extension to shoulder height. Lower under control.",tip:"Pin your elbows at your sides — they shouldn't drift forward. If you're swinging, drop the weight.",wt:"65-85 lb. Ego is the enemy on curls."},
+  {name:"Incline Dumbbell Curl",sets:"3 x 10-12",desc:"Sit on a 45-degree incline, let arms hang straight down. Curl dumbbells up, supinating your wrists at the top.",tip:"The incline stretches the long head of the bicep — that's the peak. Don't rush the negative.",wt:"25-35 lb dumbbells."},
+  {name:"Explosive Band Pull-Aparts",sets:"3 x 15",desc:"Hold a resistance band at chest height, arms extended. Pull apart explosively, squeezing rear delts.",tip:"Athletic finisher for shoulder health and posture. Snap the band apart fast, control it back slow.",wt:"Medium resistance band. Focus on speed and contraction."},
+]},
+"Wednesday": { focus: "Legs & Core — Power Foundation", exercises: [
+  {name:"Barbell Back Squat",sets:"4 x 6-8",desc:"Bar on upper traps, feet shoulder-width, sit back and down to parallel or just below. Drive up through your heels.",tip:"Brace your core hard before every rep. Knees should track over your toes, not cave inward. Own the bottom position.",wt:"Start around 185-225 lb. Working toward 1.5x BW squat is a great target."},
+  {name:"Romanian Deadlift (Barbell)",sets:"3 x 8-10",desc:"Hold barbell at hips, push hips back while keeping legs nearly straight. Lower until deep hamstring stretch.",tip:"The bar should stay in contact with your legs. Think about pushing your butt to the wall behind you.",wt:"135-185 lb. If you feel it in your lower back, lighten the weight."},
+  {name:"Leg Press",sets:"3 x 10-12",desc:"Sit in leg press machine, feet shoulder-width. Lower sled until knees hit 90 degrees, press back up.",tip:"Don't lock out your knees at the top. Feet higher = more glutes/hams, lower = more quads.",wt:"270-360 lb. You can push heavier here since the machine stabilizes."},
+  {name:"Walking Lunges (Dumbbells)",sets:"3 x 12 each leg",desc:"Hold dumbbells at sides, step forward into a lunge, drive through the front heel to step into the next.",tip:"Keep your torso upright. Back knee should nearly kiss the floor. Builds single-leg power for athletics.",wt:"40-55 lb dumbbells. These get brutal fast."},
+  {name:"Hanging Leg Raise",sets:"3 x 12-15",desc:"Hang from a pull-up bar, raise your legs to 90 degrees or higher. Lower under control without swinging.",tip:"Slightly round your pelvis at the top — that's what engages the lower abs. Bend knees if needed.",wt:"Bodyweight. Add a dumbbell between your feet when 15 reps is easy."},
+  {name:"Box Jumps",sets:"4 x 5",desc:"Stand facing a plyo box, dip into a quarter squat and explode upward, landing softly on the box. Step down.",tip:"Reset completely between each jump. Step down, don't jump down. Focus on height and a quiet landing.",wt:"Bodyweight. Start with a 20-24 inch box and progress height."},
+]},
+"Thursday": { focus: "Shoulders & Arms — Athletic Upper Body", exercises: [
+  {name:"Standing Barbell Overhead Press",sets:"4 x 6-8",desc:"Unrack bar at collarbone, press straight overhead to full lockout. Lower back to shoulders under control.",tip:"Squeeze your glutes and brace your core — this is a full-body lift. Push your head through at the top.",wt:"95-115 lb. Most guys can only press about 60% of their bench."},
+  {name:"Dumbbell Lateral Raise",sets:"3 x 12-15",desc:"Stand with dumbbells at sides. Raise arms out to the sides until parallel with the floor, lower slowly.",tip:"Lead with your elbows, not your hands. Think about pouring water from a pitcher at the top.",wt:"15-25 lb. If you're shrugging to get them up, drop the weight."},
+  {name:"Face Pulls (Cable)",sets:"3 x 15",desc:"Set cable at face height with rope. Pull toward your face, separating rope ends past your ears. Squeeze rear delts.",tip:"The most underrated exercise in the gym. Keep elbows high and pull apart as you pull back.",wt:"30-50 lb. Light and controlled."},
+  {name:"EZ-Bar Curl",sets:"3 x 10-12",desc:"Grip the EZ bar on the inner angles. Curl from full extension to full contraction. Lower under control.",tip:"The angled grip reduces wrist strain. Keep elbows pinned.",wt:"55-75 lb. Moderate and strict."},
+  {name:"Tricep Dips (Weighted)",sets:"3 x 8-10",desc:"Use parallel dip bars. Lower until upper arms are parallel to the floor, press back up to lockout.",tip:"Lean forward for chest, stay upright for triceps. Don't go too deep — parallel protects your shoulders.",wt:"Bodyweight to start. Add 10-25 lb once BW for 10 is easy."},
+  {name:"Plyo Push-Ups",sets:"3 x 8",desc:"Perform a push-up but explode off the ground at the top, getting your hands airborne. Land softly and repeat.",tip:"Athletic power finisher. Full extension — try to get maximum air. Keep core tight on landing.",wt:"Bodyweight only. Power and speed, not endurance."},
+]},
+"Friday": { focus: "Athletic Cardio & Conditioning", exercises: [
+  {name:"Treadmill Sprint Intervals",sets:"8 x 30s sprint / 60s walk",desc:"Set treadmill to 10-12 mph for sprints. Walk at 3.5 mph for recovery. Complete 8 rounds.",tip:"Start at a speed you can sustain for all 8 rounds. You can bump it up next week.",wt:"No added weight. If treadmill feels unsafe, use a track."},
+  {name:"Kettlebell Swings",sets:"4 x 20",desc:"Hinge at hips, swing kettlebell between legs, then snap hips forward to drive bell to chest height.",tip:"This is a hip hinge, not a squat. Squeeze your glutes at the top. The power comes from your hips.",wt:"35-53 lb kettlebell."},
+  {name:"Battle Ropes — Alternating Waves",sets:"4 x 30s on / 30s off",desc:"Grip one rope end in each hand, alternate slamming each arm up and down to create waves.",tip:"Stay low in an athletic stance — bent knees, hips back. Keep your core tight and breathe rhythmically.",wt:"Use whatever ropes are available."},
+  {name:"Agility Ladder Drills",sets:"5 min continuous",desc:"Run through various patterns: icky shuffle, in-in-out-out, lateral runs, and crossover steps.",tip:"Foot speed over everything — stay on the balls of your feet. Keep head up, pump arms.",wt:"Bodyweight. Pure athletic conditioning."},
+  {name:"Sled Push (or Prowler)",sets:"4 x 40 yards",desc:"Load a sled, grip high handles, drive it forward by extending hips and knees with each step.",tip:"Keep body at a 45-degree angle — arms locked, drive through legs. Short, choppy steps.",wt:"90-135 lb on the sled. Maintain speed for the full 40 yards."},
+  {name:"Core Finisher — Plank to Push-Up",sets:"3 x 10 each arm",desc:"Start in forearm plank. Push up to full push-up position one arm at a time, then lower back down.",tip:"Fight the rotation — hips stay square to the floor. Go slow and controlled.",wt:"Bodyweight. Add a weight vest when 10 per arm gets easy."},
+]},
+},
+"Week 2": {
+"Monday": { focus: "Chest & Triceps — Dumbbell Dominant", exercises: [
+  {name:"Flat Dumbbell Press",sets:"4 x 8-10",desc:"Lie flat on bench with a dumbbell in each hand. Press from chest level to full lockout.",tip:"Dumbbells allow a deeper stretch. Rotate pinkies slightly inward at the top for a better chest squeeze.",wt:"65-85 lb dumbbells."},
+  {name:"Decline Barbell Press",sets:"3 x 8-10",desc:"Set bench to a slight decline. Unrack bar, lower to lower chest, press up.",tip:"Decline targets the lower chest. Use a spotter or set the safety pins.",wt:"155-195 lb. Most people are stronger on decline than flat."},
+  {name:"Machine Pec Deck Fly",sets:"3 x 12-15",desc:"Sit in the pec deck, place forearms against pads. Bring pads together, squeeze, return.",tip:"Machine keeps constant tension. Don't let pads go too far back. Hold squeeze for 2 seconds.",wt:"100-140 lb. Moderate."},
+  {name:"Tricep Rope Pushdown",sets:"3 x 12-15",desc:"Attach rope to high cable. Push down until arms fully extended, spreading rope apart at bottom.",tip:"Keep elbows locked at your sides. Splitting the rope hits the lateral head hard.",wt:"40-60 lb. Isolation — feel every rep."},
+  {name:"Skull Crushers (EZ Bar)",sets:"3 x 10-12",desc:"Lie flat, hold EZ bar above chest. Bend at elbows to lower bar toward forehead, extend back up.",tip:"Lower to forehead or just past — not to your nose. Keep elbows pointed straight up.",wt:"50-70 lb. Moderate and controlled."},
+  {name:"Explosive Clap Push-Ups",sets:"3 x 8",desc:"Standard push-up but explode off the floor, clap hands mid-air, land softly.",tip:"Full lockout explosion. If too advanced, start with plyo push-ups where hands just leave the ground.",wt:"Bodyweight. Speed and power — rest fully between sets."},
+]},
+"Tuesday": { focus: "Back & Biceps — Pull-Up Focused", exercises: [
+  {name:"Weighted Pull-Ups",sets:"4 x 6-8",desc:"Hang from pull-up bar with overhand grip. Pull up until chin clears bar. Lower fully.",tip:"The best back exercise. Start from dead hang — no kipping. Add weight with a dip belt.",wt:"Bodyweight + 10-25 lb. Use assisted machine if needed."},
+  {name:"T-Bar Row",sets:"3 x 8-10",desc:"Straddle a T-bar station. Pull handle to your chest, squeezing your back at the top.",tip:"Keep chest up and back flat. Let weight stretch at bottom for full ROM.",wt:"90-135 lb. Moderate-heavy."},
+  {name:"Single-Arm Dumbbell Row",sets:"3 x 10-12 each",desc:"One knee and hand on bench for support. Row dumbbell from full hang to your hip. Switch sides.",tip:"Pull to your hip, not chest — this engages lower lats. Slight torso rotation at top is fine.",wt:"55-75 lb."},
+  {name:"Hammer Curls",sets:"3 x 10-12",desc:"Stand with dumbbells at sides, palms facing body. Curl up keeping palms facing inward.",tip:"Hammer curls hit the brachialis — makes arms look thick from the front. No swinging.",wt:"30-40 lb. Controlled and strict."},
+  {name:"Preacher Curl",sets:"3 x 10-12",desc:"Rest upper arms on preacher pad. Curl weight up and lower to near-full extension.",tip:"The pad eliminates cheating. Don't go completely straight at bottom — protect your tendons.",wt:"50-70 lb EZ bar or moderate machine."},
+  {name:"Explosive Med Ball Slams",sets:"3 x 12",desc:"Hold med ball overhead, slam into ground as hard as possible. Catch bounce and repeat.",tip:"Full-body power. Engage lats and core on the slam. Rise on toes and use entire chain.",wt:"15-20 lb slam ball (dead ball, not bouncy)."},
+]},
+"Wednesday": { focus: "Legs & Core — Unilateral Focus", exercises: [
+  {name:"Front Squat",sets:"4 x 6-8",desc:"Bar in front rack position. Squat to parallel or below, keeping elbows high and torso upright.",tip:"Front squats force upright position — more quad-dominant. Use cross-arm grip if wrists hurt.",wt:"135-175 lb. About 70-80% of your back squat."},
+  {name:"Bulgarian Split Squat",sets:"3 x 10 each leg",desc:"Rear foot on bench behind you. Lower into deep single-leg squat, drive through front heel.",tip:"The best single-leg exercise for athletes. Keep front shin roughly vertical. Exposes imbalances.",wt:"35-50 lb dumbbells. Start lighter — balance is the challenge."},
+  {name:"Leg Curl (Machine)",sets:"3 x 12-15",desc:"Lie face down, curl weight up by bending knees. Lower under control.",tip:"Point toes away from you to better isolate hamstrings. Hold top for 1-second squeeze.",wt:"90-130 lb. Hamstrings are often the weak link."},
+  {name:"Goblet Squat",sets:"3 x 12",desc:"Hold heavy dumbbell or kettlebell at chest. Squat deep — elbows between knees at bottom.",tip:"Great for mobility and quad burn. Push knees out with elbows at the bottom.",wt:"50-70 lb. Burnout movement after heavy work."},
+  {name:"Ab Wheel Rollout",sets:"3 x 10-12",desc:"Kneel, grip ab wheel. Roll forward until nearly extended, pull back using abs.",tip:"The hardest core exercise when done right. Don't let hips sag. Only go as far as you can control.",wt:"Bodyweight. Try standing rollouts when ready."},
+  {name:"Broad Jumps",sets:"4 x 5",desc:"Stand hip-width, swing arms back, explode forward and upward, land softly on both feet.",tip:"Measure distance and try to beat it each set. Stick the landing. Reset fully between jumps.",wt:"Bodyweight. Maximum horizontal power."},
+]},
+"Thursday": { focus: "Shoulders & Arms — Volume Day", exercises: [
+  {name:"Seated Dumbbell Shoulder Press",sets:"4 x 8-10",desc:"Sit on upright bench, press dumbbells from shoulder height to full overhead lockout.",tip:"Seated removes leg cheating — pure shoulder strength. Don't arch excessively.",wt:"45-60 lb dumbbells. Strict and controlled."},
+  {name:"Cable Lateral Raise",sets:"3 x 12-15 each",desc:"Stand sideways to low cable, grab handle with far hand. Raise to shoulder height, lower slowly.",tip:"Cables provide constant tension dumbbells can't match. Start light.",wt:"10-20 lb. Harder than dumbbell laterals."},
+  {name:"Reverse Pec Deck (Rear Delt)",sets:"3 x 12-15",desc:"Sit facing pec deck. Grab handles and reverse-fly pads back, squeezing rear delts.",tip:"Lead with elbows. Pause at back for 1-second squeeze. Don't neglect rear delts.",wt:"70-100 lb. Moderate. Full ROM."},
+  {name:"Alternating Dumbbell Curl",sets:"3 x 10 each",desc:"Stand with dumbbells at sides. Curl one arm up while other stays at side. Alternate.",tip:"Supinate (rotate pinky toward ceiling) as you curl. Don't lean back — stay tall.",wt:"30-40 lb. Strict — no momentum."},
+  {name:"Overhead Dumbbell Tricep Extension",sets:"3 x 10-12",desc:"Hold one heavy dumbbell with both hands behind head, elbows up. Extend overhead, lower behind head.",tip:"Keep elbows close to head. Deep stretch at bottom targets the long head — the biggest head.",wt:"40-55 lb dumbbell."},
+  {name:"Lateral Bounds",sets:"3 x 8 each side",desc:"Stand on one leg, explosively leap sideways to opposite leg. Stick landing, pause, bound back.",tip:"Athletic power for lateral quickness. Absorb through hip, not knee. Pause on landing.",wt:"Bodyweight. Distance and stable landings."},
+]},
+"Friday": { focus: "Athletic Cardio & Conditioning", exercises: [
+  {name:"Rowing Machine Intervals",sets:"6 x 500m, 90s rest",desc:"Row 500m at max effort, rest 90 seconds, repeat for 6 rounds.",tip:"Sequence: legs-back-arms on pull. Most people arm-pull — power comes from legs.",wt:"Bodyweight. Track 500m splits — aim for consistency."},
+  {name:"Dumbbell Thrusters",sets:"4 x 12",desc:"Dumbbells at shoulder height, squat, and as you stand press overhead in one fluid motion.",tip:"Full-body cardio burner. Use squat momentum to drive the press.",wt:"30-40 lb dumbbells."},
+  {name:"Box Jumps with Step Down",sets:"4 x 8",desc:"Explode onto plyo box, land softly, step down and reset.",tip:"Step down, never jump down. Use a slightly lower box for higher reps (18-22 inches).",wt:"Bodyweight."},
+  {name:"Bear Crawl",sets:"4 x 40 yards",desc:"Hands and feet on ground, knees hovering. Crawl forward with opposite hand and foot.",tip:"Keep back flat and hips low. Slow and controlled. Destroys shoulders, core, and conditioning.",wt:"Bodyweight. Sounds easy, isn't."},
+  {name:"Jump Rope — Mixed Patterns",sets:"5 min continuous",desc:"Alternate: regular bounce, single-leg hops, high knees, double-unders. Switch every 30 seconds.",tip:"Stay on balls of feet. Wrists do the work. If you trip, restart immediately.",wt:"Bodyweight. Weighted ropes (1-2 lb) are a great progression."},
+  {name:"Farmer's Walk",sets:"4 x 60 yards",desc:"Grab heaviest dumbbells you can. Walk with tall posture for 60 yards.",tip:"Total body conditioning. Grip, traps, core, legs — everything works. Stand tall.",wt:"70-100 lb per hand. Go heavy."},
+]},
+},
+"Week 3": {
+"Monday": { focus: "Chest & Triceps — Incline Priority", exercises: [
+  {name:"Incline Barbell Press",sets:"4 x 6-8",desc:"Set bench to 30 degrees. Unrack bar, lower to upper chest, press to lockout.",tip:"Upper chest is where most guys are underdeveloped. Don't go steeper than 30 degrees.",wt:"135-165 lb. About 80% of your flat bench."},
+  {name:"Flat Dumbbell Fly",sets:"3 x 10-12",desc:"Lie flat, extend dumbbells above chest. Open arms in wide arc until chest stretch, bring back together.",tip:"Slight bend in elbows — this is an arc, not a press. Don't go below shoulder level.",wt:"35-50 lb dumbbells. Feel every inch of ROM."},
+  {name:"Chest Dip (Weighted)",sets:"3 x 8-10",desc:"Parallel bars, lean forward 30 degrees, lower until upper arms parallel, press back up.",tip:"Forward lean = lower chest. Upright = triceps. Go to parallel, not deeper.",wt:"Bodyweight + 10-25 lb (dip belt)."},
+  {name:"Diamond Push-Ups",sets:"3 x 12-15",desc:"Push-up position with hands close forming diamond shape. Lower chest to hands and press up.",tip:"King of bodyweight tricep exercises. Keep elbows tight to body.",wt:"Bodyweight. Elevate feet on bench to increase difficulty."},
+  {name:"Tricep Kickbacks (Cable)",sets:"3 x 12-15 each",desc:"Hinge forward, pin elbow at side. Extend forearm behind you until arm is fully straight.",tip:"Cable keeps constant tension. Hold lockout for 1 second. Upper arm should not move at all.",wt:"15-25 lb. Light and precise."},
+  {name:"Explosive Med Ball Push-Up",sets:"3 x 6 each hand",desc:"One hand on med ball, one on floor. Push-up, then explosively shift so other hand lands on ball.",tip:"Advanced finisher. Asymmetry creates rotational demand on core. Start slow.",wt:"Bodyweight + 10-15 lb med ball."},
+]},
+"Tuesday": { focus: "Back & Biceps — Deadlift Day", exercises: [
+  {name:"Conventional Deadlift",sets:"4 x 5",desc:"Feet hip-width, grip bar outside shins. Drive through floor, keep bar close, lock out at top.",tip:"The king. Push the floor away — don't pull up. Keep chest up, back neutral. Bar drags your shins.",wt:"225-275 lb. A 2x BW deadlift is a great long-term target."},
+  {name:"Chest-Supported Row (Incline DB)",sets:"3 x 10-12",desc:"Lie face-down on incline bench, row both dumbbells to ribs, squeezing back.",tip:"Chest support removes lower back fatigue — perfect after deadlifts. Squeeze for 1 second.",wt:"45-65 lb dumbbells. Strict form."},
+  {name:"Straight-Arm Pulldown (Cable)",sets:"3 x 12-15",desc:"Stand facing high cable with straight bar. Keep arms straight, pull bar to thighs in an arc.",tip:"Isolates lats without bicep involvement. Keep elbows locked. Feel your lats doing all the work.",wt:"40-60 lb. Light and controlled."},
+  {name:"Concentration Curl",sets:"3 x 12 each",desc:"Sit on bench, brace elbow against inner thigh. Curl dumbbell from full extension to contraction.",tip:"Arnold's favorite. Braced elbow makes cheating impossible. Squeeze 2 seconds at top.",wt:"25-35 lb. 2 seconds up, 2 seconds down."},
+  {name:"Reverse Grip Barbell Curl",sets:"3 x 12",desc:"Hold barbell with overhand grip (palms down). Curl up keeping wrists straight.",tip:"Targets brachioradialis and forearms. Keep bar light and control the movement.",wt:"40-55 lb. Harder than they look."},
+  {name:"Renegade Rows",sets:"3 x 8 each arm",desc:"Push-up position on dumbbells. Row one to hip while bracing on other. Alternate.",tip:"Core stability + back strength. Widen feet for stability. Fight to stay square.",wt:"25-40 lb dumbbells."},
+]},
+"Wednesday": { focus: "Legs & Core — Explosive Power", exercises: [
+  {name:"Trap Bar Deadlift",sets:"4 x 6-8",desc:"Stand inside trap bar, grip handles, drive through floor to stand. Lower under control.",tip:"More athletic than conventional — neutral grip and centered load. Great for jump performance.",wt:"225-275 lb. You can typically trap bar more than conventional."},
+  {name:"Step-Ups (Dumbbell)",sets:"3 x 10 each leg",desc:"Stand facing bench (knee height). Step up, drive through heel to stand on top. Step down.",tip:"Don't push off back foot — all drive from working leg. Builds single-leg sprint power.",wt:"40-55 lb dumbbells."},
+  {name:"Leg Extension (Machine)",sets:"3 x 12-15",desc:"Sit in machine, extend legs fully straight. Squeeze quads at top, lower slowly.",tip:"Point toes slightly outward for VMO. Hold top for 2 seconds. Control the negative.",wt:"100-150 lb. Moderate isolation."},
+  {name:"Hip Thrust (Barbell)",sets:"3 x 10-12",desc:"Upper back on bench, bar across hips. Drive through heels to full extension. Squeeze glutes.",tip:"Best glute builder. Use bar pad. Shins vertical at top. Don't hyperextend lower back.",wt:"185-225 lb. Go heavy — glutes are the strongest muscle."},
+  {name:"Pallof Press (Cable)",sets:"3 x 12 each side",desc:"Stand sideways to cable at chest height. Press handle straight out, hold 2 seconds, return.",tip:"Anti-rotation core work. Builds core stability for heavy lifts and athletics.",wt:"25-40 lb. If you're twisting, go lighter."},
+  {name:"Depth Jumps",sets:"4 x 5",desc:"Stand on 12-18\" box. Step off (don't jump), and the moment feet hit ground, explode upward max height.",tip:"Most advanced plyometric. Minimum ground contact time. Training your stretch reflex.",wt:"Bodyweight. Start with 12\" box. Pure reactive power."},
+]},
+"Thursday": { focus: "Shoulders & Arms — Compound Emphasis", exercises: [
+  {name:"Push Press (Barbell)",sets:"4 x 6-8",desc:"Bar at collarbone. Dip knees slightly, explosively drive bar overhead using legs to initiate.",tip:"Unlike strict press, you USE your legs — this is athletic. Shallow dip (3-4 inches). 20-30% more weight than strict.",wt:"115-135 lb. Explosive."},
+  {name:"Arnold Press (Dumbbells)",sets:"3 x 10-12",desc:"Start at chin height, palms facing you. As you press up, rotate palms to face forward at top.",tip:"Rotation hits all three deltoid heads. Smooth and continuous rotation. Don't go too heavy.",wt:"35-45 lb dumbbells."},
+  {name:"Upright Row (Dumbbells)",sets:"3 x 10-12",desc:"Hold dumbbells in front of thighs. Pull straight up to chin height, leading with elbows.",tip:"Dumbbells are safer than barbell — allow natural wrist rotation. Don't pull above chin.",wt:"25-35 lb dumbbells."},
+  {name:"Spider Curl (Incline Bench)",sets:"3 x 10-12",desc:"Lie face-down on incline bench, arms hanging. Curl dumbbells up, pause at top, lower slowly.",tip:"Hits short head and eliminates momentum. Arms perpendicular to floor. Go slow.",wt:"20-30 lb dumbbells. Lighter than you expect."},
+  {name:"Close-Grip Cable Pushdown",sets:"3 x 12-15",desc:"Straight bar on high cable. Grip shoulder-width, push to full lockout. Return slowly.",tip:"Keep elbows locked at sides. Straight bar emphasizes the lateral head.",wt:"50-70 lb. Moderate."},
+  {name:"Single-Arm KB Clean & Press",sets:"3 x 6 each arm",desc:"Clean kettlebell from floor to rack, then press overhead. Lower to rack, then floor.",tip:"Full-body athletic movement. Clean with hips, not arm. Quality over quantity.",wt:"35-44 lb kettlebell."},
+]},
+"Friday": { focus: "Athletic Cardio & Conditioning", exercises: [
+  {name:"Assault Bike Intervals",sets:"8 x 20s max / 40s easy",desc:"Sprint 20 seconds absolute max, pedal easy 40 seconds. Repeat 8 times.",tip:"The ultimate conditioning tool. Don't hold back on sprints.",wt:"Bodyweight. Track calories per round."},
+  {name:"Turkish Get-Up",sets:"3 x 3 each side",desc:"Lie holding kettlebell overhead. Slowly rise to standing while keeping KB locked overhead. Reverse.",tip:"Most complete single exercise — mobility, stability, strength. Go SLOW. Eyes on the kettlebell.",wt:"25-35 lb kettlebell. Light. Quality of movement."},
+  {name:"Burpee Broad Jumps",sets:"4 x 8",desc:"Full burpee, but instead of jumping up, explode forward into broad jump. Walk back.",tip:"Conditioning + explosive power. Full burpee to ground, then most explosive broad jump possible.",wt:"Bodyweight."},
+  {name:"Stair Sprints or Hill Sprints",sets:"6 x 20-30 seconds",desc:"Sprint up a hill or staircase at max effort. Walk down for recovery.",tip:"Incline sprinting is safer — naturally limits speed and reduces hamstring strain risk.",wt:"Bodyweight. Walk down slowly — recovery IS the rest."},
+  {name:"Medicine Ball Circuit",sets:"3 rounds, 10 reps each",desc:"10 wall balls + 10 rotational slams (each side) + 10 overhead throws. 60s rest between rounds.",tip:"Move fast between exercises. Wall balls: squat deep, throw high. Rotational slams: use core.",wt:"14-20 lb med ball."},
+  {name:"Dead Bug",sets:"3 x 12 each side",desc:"Lie on back, arms up, knees 90°. Extend opposite arm and leg until near-floor. Alternate.",tip:"Press lower back into floor. If it arches, you've gone too far. Exhale as you extend.",wt:"Bodyweight. Add 5-10 lb dumbbells for progression."},
+]},
+},
+"Week 4": {
+"Monday": { focus: "Chest & Triceps — Machine & Isolation", exercises: [
+  {name:"Smith Machine Incline Press",sets:"4 x 8-10",desc:"Bench at 30° under Smith machine. Lower to upper chest, press to lockout.",tip:"Fixed path = pure pushing without stabilizer fatigue. Great for volume after 3 weeks of free weights.",wt:"135-175 lb. Moderate-heavy."},
+  {name:"Landmine Press",sets:"3 x 10 each arm",desc:"Hold end of barbell in landmine. Press from shoulder height upward at an angle.",tip:"Unique angle that's easy on shoulders. Drive with whole body. Stabilize with core.",wt:"Bar + 25-35 lb. Harder than it looks."},
+  {name:"Cable Crossover — Low to High",sets:"3 x 12-15",desc:"Cables low position. Bring handles upward and together in a scooping arc.",tip:"Targets upper chest fibers — reverse of Week 1. Squeeze at top, hold 1 second.",wt:"20-35 lb per side."},
+  {name:"Dip Machine (Tricep Focus)",sets:"3 x 12",desc:"Assisted or plate-loaded dip machine. Press down, torso upright for tricep emphasis.",tip:"Upright = tricep dominant. Push for higher reps and burn out the muscle.",wt:"BW equivalent or add 10-25 lb."},
+  {name:"Single-Arm Tricep Cable Pushdown",sets:"3 x 12-15 each",desc:"Single handle on high cable. Push down one arm at a time to full lockout.",tip:"Unilateral work exposes imbalances. Weaker arm goes first and sets the rep count.",wt:"15-25 lb per arm."},
+  {name:"Explosive Banded Push-Ups",sets:"3 x 10",desc:"Loop resistance band across back, hold ends under hands. Explosive push-ups against band.",tip:"Band adds resistance at top where push-ups are easiest. Push through violently.",wt:"Bodyweight + medium band."},
+]},
+"Tuesday": { focus: "Back & Biceps — Machine & Cable Focus", exercises: [
+  {name:"Lat Pulldown (Close Grip, V-Bar)",sets:"4 x 8-10",desc:"V-bar attachment. Pull to upper chest, squeeze, return slowly.",tip:"Close grip = lower lats + more bicep involvement. Lean back slightly. 3-second negatives.",wt:"130-170 lb. Slow eccentrics."},
+  {name:"Meadows Row (Landmine)",sets:"3 x 10 each arm",desc:"Stand perpendicular to landmine. Grab bar overhand, row to hip with one arm.",tip:"Angled pull hits lats from unique angle. Stagger stance with inside foot forward.",wt:"Bar + 25-45 lb. Start moderate."},
+  {name:"Machine Low Row",sets:"3 x 10-12",desc:"Plate-loaded or cable low row. Pull handles to lower abdomen, squeeze, return slowly.",tip:"Machine stability = pure squeeze. Pull to belly button. 2-second pause at peak.",wt:"120-180 lb. Quality contractions."},
+  {name:"Cable Curl (Low Pulley)",sets:"3 x 12-15",desc:"Straight bar on low cable. Curl from full extension to full contraction.",tip:"Cables keep tension at top where free weights go slack. Elbows anchored.",wt:"40-60 lb. Feel the peak squeeze."},
+  {name:"Cross-Body Hammer Curl",sets:"3 x 10 each arm",desc:"Curl across body toward opposite shoulder instead of straight up.",tip:"Cross-body targets brachialis from different angle. Slow diagonal path. Hold 1 second.",wt:"25-35 lb. Moderate and strict."},
+  {name:"Explosive Inverted Row",sets:"3 x 10",desc:"Bar at hip height. Lie underneath, pull chest to bar explosively. Lower under control.",tip:"Explosive pull trains rate of force development. Full hang at bottom.",wt:"Bodyweight. Weight vest for progression."},
+]},
+"Wednesday": { focus: "Legs & Core — Machine Burnout", exercises: [
+  {name:"Hack Squat (Machine)",sets:"4 x 8-10",desc:"Stand in hack squat, feet shoulder-width. Lower until thighs parallel, press back up.",tip:"Machine supports back — focus purely on quads. Low/close feet = quad, high/wide = glute.",wt:"180-270 lb. Heavier than free squats."},
+  {name:"Single-Leg Leg Press",sets:"3 x 10 each leg",desc:"One leg at a time on leg press. Working foot in center of platform.",tip:"Weaker leg goes first. Don't let knee cave inward. Exposes imbalances.",wt:"135-180 lb per leg."},
+  {name:"Lying Hamstring Curl",sets:"3 x 12-15",desc:"Face-down, curl weight by bending knees. Squeeze at top, lower slowly.",tip:"Different angle than Week 2's machine. Don't lift hips off pad. Hold top 1 second.",wt:"80-120 lb. Full ROM."},
+  {name:"Seated Calf Raise",sets:"4 x 15-20",desc:"Calf raise machine, pad on knees. Rise on balls of feet, squeeze, lower to full stretch.",tip:"Seated targets soleus. Full stretch at bottom is critical — most people short-change ROM.",wt:"90-135 lb. Higher reps — calves are stubborn."},
+  {name:"Cable Woodchop",sets:"3 x 12 each side",desc:"Cable high position. Stand sideways, pull diagonally across body from high to low.",tip:"Rotational core power athletes actually need. Arms stay straight — rotation from hips and core.",wt:"30-50 lb. Control the rotation."},
+  {name:"Tuck Jumps",sets:"4 x 6",desc:"Jump as high as possible, pulling knees to chest at peak. Land softly.",tip:"Pure explosive power. Vertical jump — don't lean forward. Land quietly.",wt:"Bodyweight. Maximum vertical explosion."},
+]},
+"Thursday": { focus: "Shoulders & Arms — Superset Burnout", exercises: [
+  {name:"Barbell Z-Press",sets:"4 x 6-8",desc:"Sit on floor, legs straight. Press barbell overhead from shoulders. No back support.",tip:"Brutally honest — shoulders and core do everything. If you lean back, you fall. Start light.",wt:"65-85 lb. Much less than standing OHP."},
+  {name:"Lu Raises (Front to Lateral)",sets:"3 x 10",desc:"Raise dumbbells in front (front raise), then open out to sides (lateral), lower from sides.",tip:"One fluid motion. Continuous tension is brutal. Keep thumbs slightly up.",wt:"10-15 lb. Extremely light."},
+  {name:"Barbell Shrug",sets:"3 x 12-15",desc:"Barbell at arm's length. Shrug straight up to ears. Squeeze at top, lower slowly.",tip:"Don't roll shoulders — straight up and down. If you can't squeeze 1 second, too heavy.",wt:"185-225 lb. Heavy. Traps can handle it."},
+  {name:"Bicep 21s (EZ Bar)",sets:"3 sets",desc:"7 reps bottom half, 7 reps top half, 7 reps full ROM. No rest between segments.",tip:"The ultimate bicep pump. Go straight from bottom 7 to top 7 to full 7.",wt:"40-55 lb. 21 continuous reps is no joke."},
+  {name:"JM Press",sets:"3 x 10",desc:"Lie flat with EZ bar. Lower toward chin (skull crusher path) but elbows tight (close-grip style).",tip:"Hybrid movement. Bar goes to chin/throat area. Keep elbows at 45 degrees.",wt:"60-80 lb. Nail the path before going heavy."},
+  {name:"Single-Leg Box Jump",sets:"3 x 4 each leg",desc:"Stand on one leg, explode onto box. Land on both feet. Step down.",tip:"Advanced finisher. Use lower box (12-16\"). Builds single-leg power for cutting and sprinting.",wt:"Bodyweight. Max effort per rep."},
+]},
+"Friday": { focus: "Athletic Cardio — Test Week", exercises: [
+  {name:"400m Run Repeats",sets:"6 x 400m, 2 min rest",desc:"Sprint one full track lap. Rest 2 minutes walking. Repeat 6 times.",tip:"Gold standard conditioning test. Start at 85% — last 2 rounds at max. Track your times.",wt:"No weight. Target: sub 90-second 400m."},
+  {name:"Clean & Press Complex",sets:"5 x 5",desc:"Power clean barbell to shoulders, strict press overhead. Lower back down. That's 1 rep.",tip:"Total body power. The clean is a hip explosion — not a reverse curl. Reset fully each rep.",wt:"95-115 lb. Every rep should look the same."},
+  {name:"Sled Pull (Hand Over Hand)",sets:"4 x 30 yards",desc:"Attach rope to sled. Pull toward you hand over hand.",tip:"Upper body conditioning and grip destroyer. Pull with your back, not just arms.",wt:"90-135 lb on sled."},
+  {name:"Lateral Shuffle to Sprint",sets:"6 x (20 yd + 20 yd)",desc:"Lateral shuffle 20 yards, transition into 20-yard forward sprint. Walk back.",tip:"Sport-specific. Stay low in shuffle. The transition is where athletic ability lives.",wt:"Bodyweight."},
+  {name:"Hanging Knee Raise to Windshield Wiper",sets:"3 x 8",desc:"Hang from bar. Raise knees to chest, rotate both knees side to side. Full left-right = 1 rep.",tip:"Rotational power and anti-rotation strength. Control the rotation — don't swing.",wt:"Bodyweight. Advanced core."},
+  {name:"Cooldown — Jog + Stretch",sets:"10 min jog + 5 min stretch",desc:"Light jog to bring heart rate down, then full-body static stretching.",tip:"You finished 4 weeks. Hold each stretch 30+ seconds. Breathe deeply.",wt:"No weight. Celebrate the work."},
+]},
+},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let currentUser = 'ken';
+let currentWeek = 'Week 1';
+let currentDay = 'Monday';
+
+function storageKey(user, week, day, exIdx, field) {
+  return `apb_${user}_${week}_${day}_${exIdx}_${field}`;
+}
+
+function getData(exIdx, field) {
+  return localStorage.getItem(storageKey(currentUser, currentWeek, currentDay, exIdx, field)) || '';
+}
+
+function setData(exIdx, field, value) {
+  const key = storageKey(currentUser, currentWeek, currentDay, exIdx, field);
+  if (value) localStorage.setItem(key, value);
+  else localStorage.removeItem(key);
+}
+
+function isExDone(user, week, day, exIdx) {
+  return localStorage.getItem(storageKey(user, week, day, exIdx, 'done')) === '1';
+}
+
+function isDayCompleted(user, week, day) {
+  const exs = PROGRAM[week]?.[day]?.exercises;
+  if (!exs) return false;
+  return exs.every((_, i) => isExDone(user, week, day, i));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function switchUser(user) {
+  currentUser = user;
+  document.querySelectorAll('.user-tab').forEach(t => t.classList.toggle('active', t.dataset.user === user));
+  renderAll();
+}
+
+function selectWeek(week) {
+  currentWeek = week;
+  currentDay = 'Monday';
+  renderAll();
+}
+
+function selectDay(day) {
+  currentDay = day;
+  renderDayContent();
+}
+
+function renderAll() {
+  renderWeekSelector();
+  renderDaySelector();
+  renderDayContent();
+}
+
+function renderWeekSelector() {
+  const el = document.getElementById('weekSelector');
+  el.innerHTML = '';
+  ['Week 1','Week 2','Week 3','Week 4'].forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'week-btn' + (w === currentWeek ? ' active' : '');
+    btn.textContent = w.toUpperCase();
+    btn.onclick = () => selectWeek(w);
+    el.appendChild(btn);
+  });
+}
+
+function renderDaySelector() {
+  const el = document.getElementById('daySelector');
+  el.innerHTML = '';
+  ['Monday','Tuesday','Wednesday','Thursday','Friday'].forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (d === currentDay ? ' active' : '');
+    btn.dataset.day = d;
+    const completed = isDayCompleted(currentUser, currentWeek, d);
+    if (completed) btn.classList.add('completed');
+    const dot = document.createElement('span');
+    dot.className = 'done-dot';
+    btn.appendChild(dot);
+    const labels = {Monday:'MON',Tuesday:'TUE',Wednesday:'WED',Thursday:'THU',Friday:'FRI'};
+    btn.appendChild(document.createTextNode(labels[d]));
+    btn.onclick = () => selectDay(d);
+    el.appendChild(btn);
+  });
+}
+
+function renderDayContent() {
+  const dayData = PROGRAM[currentWeek]?.[currentDay];
+  if (!dayData) return;
+
+  // Day header
+  const hdr = document.getElementById('dayHeaderWrap');
+  hdr.innerHTML = `<div class="day-header ${currentDay}">
+    <h2>${currentDay}</h2>
+    <p>${dayData.focus}</p>
+  </div>`;
+
+  // Exercises
+  const list = document.getElementById('exerciseList');
+  list.innerHTML = '';
+  const exercises = dayData.exercises;
+
+  exercises.forEach((ex, i) => {
+    const done = getData(i, 'done') === '1';
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (done ? ' checked' : '');
+    card.id = `ex-card-${i}`;
+
+    card.innerHTML = `
+      <div class="ex-header" onclick="toggleDetails(${i})">
+        <div class="ex-check ${done ? 'done' : ''}" id="check-${i}" onclick="event.stopPropagation(); toggleDone(${i})"></div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-sets">${ex.sets}</div>
+        </div>
+        <button class="ex-toggle" id="toggle-${i}">▼</button>
+      </div>
+      <div class="ex-details" id="details-${i}">
+        <div class="ex-desc">${ex.desc}</div>
+        <div class="ex-tip"><b>Pro Tip:</b> ${ex.tip}</div>
+        <div class="ex-wt">Weight: ${ex.wt}</div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>Weight Used</label>
+            <input type="text" inputmode="numeric" placeholder="lbs"
+              id="wt-${i}" value="${getData(i,'weight')}"
+              onchange="setData(${i},'weight',this.value)">
+          </div>
+          <div class="input-group">
+            <label>Reps Done</label>
+            <input type="text" inputmode="text" placeholder="e.g. 8,8,7,6"
+              id="reps-${i}" value="${getData(i,'reps')}"
+              onchange="setData(${i},'reps',this.value)">
+          </div>
+        </div>
+        <div class="input-group notes-group">
+          <label>Notes</label>
+          <textarea placeholder="How'd it feel?"
+            id="notes-${i}" onchange="setData(${i},'notes',this.value)">${getData(i,'notes')}</textarea>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  updateProgress();
+  renderSummary();
+  renderDaySelector(); // update green dots
+}
+
+function toggleDone(idx) {
+  const cur = getData(idx, 'done');
+  setData(idx, 'done', cur === '1' ? '' : '1');
+  const done = getData(idx, 'done') === '1';
+
+  const check = document.getElementById(`check-${idx}`);
+  const card = document.getElementById(`ex-card-${idx}`);
+  check.classList.toggle('done', done);
+  card.classList.toggle('checked', done);
+
+  updateProgress();
+  renderSummary();
+  renderDaySelector();
+}
+
+function toggleDetails(idx) {
+  const det = document.getElementById(`details-${idx}`);
+  const tog = document.getElementById(`toggle-${idx}`);
+  det.classList.toggle('show');
+  tog.classList.toggle('open');
+}
+
+function updateProgress() {
+  const exs = PROGRAM[currentWeek]?.[currentDay]?.exercises || [];
+  let done = 0;
+  exs.forEach((_, i) => { if (getData(i, 'done') === '1') done++; });
+  const pct = exs.length ? Math.round(done / exs.length * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done}/${exs.length}`;
+}
+
+function renderSummary() {
+  const wrap = document.getElementById('summaryWrap');
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  let totalEx = 0, totalDone = 0;
+  const dayLogs = [];
+
+  days.forEach(d => {
+    const exs = PROGRAM[currentWeek]?.[d]?.exercises || [];
+    let dayDone = 0;
+    exs.forEach((ex, i) => {
+      totalEx++;
+      if (isExDone(currentUser, currentWeek, d, i)) { totalDone++; dayDone++; }
+    });
+    dayLogs.push({ day: d, total: exs.length, done: dayDone });
+  });
+
+  const pct = totalEx ? Math.round(totalDone / totalEx * 100) : 0;
+
+  // Build logged exercises table for current day
+  const currentExs = PROGRAM[currentWeek]?.[currentDay]?.exercises || [];
+  let logRows = '';
+  currentExs.forEach((ex, i) => {
+    const done = isExDone(currentUser, currentWeek, currentDay, i);
+    const w = localStorage.getItem(storageKey(currentUser, currentWeek, currentDay, i, 'weight')) || '—';
+    const r = localStorage.getItem(storageKey(currentUser, currentWeek, currentDay, i, 'reps')) || '—';
+    const cls = done ? 'completed-row' : 'pending-row';
+    logRows += `<tr class="${cls}"><td>${ex.name}</td><td>${w}</td><td>${r}</td></tr>`;
+  });
+
+  wrap.innerHTML = `
+    <div class="summary-section">
+      <h3>${currentUser === 'ken' ? 'Ken' : 'Hayden'}'s ${currentWeek} Summary</h3>
+      <div class="summary-grid">
+        <div class="stat-box"><div class="stat-num" style="color:var(--green)">${totalDone}</div><div class="stat-label">Exercises Done</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--blue)">${totalEx - totalDone}</div><div class="stat-label">Remaining</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--orange)">${pct}%</div><div class="stat-label">Week Complete</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--purple)">${dayLogs.filter(d=>d.done===d.total).length}/5</div><div class="stat-label">Days Done</div></div>
+      </div>
+      ${logRows ? `<table class="log-table">
+        <tr><th>Exercise</th><th>Weight</th><th>Reps</th></tr>
+        ${logRows}
+      </table>` : ''}
+    </div>
+  `;
+}
+
+function resetCurrentDay() {
+  if (!confirm(`Reset all ${currentDay} data for ${currentUser === 'ken' ? 'Ken' : 'Hayden'}?`)) return;
+  const exs = PROGRAM[currentWeek]?.[currentDay]?.exercises || [];
+  exs.forEach((_, i) => {
+    ['done','weight','reps','notes'].forEach(f => {
+      localStorage.removeItem(storageKey(currentUser, currentWeek, currentDay, i, f));
+    });
+  });
+  renderDayContent();
+}
+
+function exportData() {
+  let output = `ATHLETIC POWER BUILDING LOG\n${currentUser === 'ken' ? 'Ken' : 'Hayden'}\n${'='.repeat(40)}\n\n`;
+  ['Week 1','Week 2','Week 3','Week 4'].forEach(w => {
+    output += `\n${w.toUpperCase()}\n${'-'.repeat(30)}\n`;
+    ['Monday','Tuesday','Wednesday','Thursday','Friday'].forEach(d => {
+      const exs = PROGRAM[w]?.[d]?.exercises || [];
+      let hasData = false;
+      let dayStr = `\n  ${d} — ${PROGRAM[w][d].focus}\n`;
+      exs.forEach((ex, i) => {
+        const wt = localStorage.getItem(storageKey(currentUser, w, d, i, 'weight'));
+        const reps = localStorage.getItem(storageKey(currentUser, w, d, i, 'reps'));
+        const notes = localStorage.getItem(storageKey(currentUser, w, d, i, 'notes'));
+        const done = localStorage.getItem(storageKey(currentUser, w, d, i, 'done'));
+        if (wt || reps || notes || done) {
+          hasData = true;
+          dayStr += `    ${done === '1' ? '✓' : '○'} ${ex.name}: ${wt || '—'} lbs, ${reps || '—'} reps${notes ? ' | ' + notes : ''}\n`;
+        }
+      });
+      if (hasData) output += dayStr;
+    });
+  });
+
+  const blob = new Blob([output], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `workout_log_${currentUser}.txt`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderAll();
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(() => {
+    console.log('SW registered');
+  }).catch(err => console.log('SW failed:', err));
+}
+</script>
+</body>
+</html>
