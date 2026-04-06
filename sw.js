@@ -1,4 +1,4 @@
-const CACHE_NAME = 'power-build-v1';
+const CACHE_NAME = 'power-build-v2';
 const ASSETS = [
   './',
   './index.html',
